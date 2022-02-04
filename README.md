@@ -1,8 +1,5 @@
-# Group6-Projects
-This is a repo for various projects between group 6 during the spring 2022 semester. 
-Members within group 6 include Khail Ahlibai, Prashant Kumar, Brodie Milne.
-Code is uploaded here to be used with Lego Mindstorms EV3 microcontroller and Matlab.
-to use this repo, clone the respective branch for the given project you wish to work on.
-from there, make a branch to start working on the new part of the project a given project
-within that new part, you can make changes as you like with any part of the code.
-once ready to bring it back into the main code, only merge to the project branch of the project you are working on
+# MSE211-Lab1
+The included matlab files allow one to simulate calculations to find the roots of a given equation.
+This is written for MSE 211 lab1 finding the roots of equations using secant and bisection methods,
+afterwards it is then implemented in finding the positions of a 4 bar link system
+to find the position in ortientation of the actuating links due to a sweep of angles from [0,2pi]
