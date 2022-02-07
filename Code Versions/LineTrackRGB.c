@@ -14,13 +14,15 @@ int targetColor = 15;
 int rightMtrSpd;
 int leftMtrSpd;
 const int speed = 25;
+float wheelDiameter = 0.056;
 
 int red;
 int blue;
 int green;
 
 void pickUp() {
-	setMotorTarget(armMotor, 90, 30);
+	//find box to pickup and drive into postion to begin tracking
+	setMotorTarget(armMotor, 45, 30);
 	waitUntilMotorStop(armMotor);
 	while(getUSDistance(sonarSensor) > 3){
 		setMotorSpeed(leftMotor, 10);
@@ -28,15 +30,15 @@ void pickUp() {
 	}
 	setMotorSpeed(leftMotor, 0);
 	setMotorSpeed(rightMotor, 0);
-	setMotorTarget(armMotor, -80, 30);
+	setMotorTarget(armMotor, -45, 30);
 	//waitUntilMotorStop(armMotor);
-	setMotorTarget(leftMotor,480, 10);
-	setMotorTarget(rightMotor,480, 10);
+	setMotorTarget(leftMotor,700, 10);//480
+	setMotorTarget(rightMotor,700, 10);
 	waitUntilMotorStop(leftMotor);
 
 }
 
-task stopAndResetMotors(){
+void stopAndResetMotors(){
 	setMotorSpeed(rightMotor, 0);
 	setMotorSpeed(leftMotor, 0);
 	resetMotorEncoder(rightMotor);
@@ -45,7 +47,7 @@ task stopAndResetMotors(){
 
 
 void putDown() {
-	startTask(stopAndResetMotors);
+	stopAndResetMotors();
 	setMotorSpeed(leftMotor, 0);
 	setMotorSpeed(rightMotor, 0);
 	setMotorTarget(armMotor, 90, 30);
@@ -61,7 +63,8 @@ void putDown() {
 bool calibration(){
 //returns true if line is on Robot's right, false if line is on left
 
-	startTask(stopAndResetMotors);
+
+	stopAndResetMotors();
 	int encoderTarget = 90;
 	displayCenteredTextLine(3, "Calibrating...");
 	setLEDColor(ledOrange);
@@ -70,39 +73,44 @@ bool calibration(){
 		setMotorSpeed(rightMotor, 5); //rotate left
 		setMotorSpeed(leftMotor, -5);
 
+		//rotate until either the color is found or limit reached
 		waitUntil((getColorReflected(colorSensor) <= targetColor + 10 && getColorReflected(colorSensor) >= targetColor - 10)  || abs(getMotorEncoder(rightMotor))>= encoderTarget);
-		startTask(stopAndResetMotors);
+		stopAndResetMotors();
 
+		//if the target color has been found, rotate back straight and finish calibration
 		if ((getColorReflected(colorSensor) <= targetColor + 10 && getColorReflected(colorSensor) >= targetColor - 10)){
 			setMotorSpeed(rightMotor, -5); //rotate right
 			setMotorSpeed(leftMotor, 5);
 			waitUntil(abs(getMotorEncoder(rightMotor))>= encoderTarget);
-			startTask(stopAndResetMotors);
+			stopAndResetMotors();
 			return false; //line is on left
 		}
 
 		setMotorSpeed(rightMotor, -5); //rotate right
 		setMotorSpeed(leftMotor, 5);
 
+		//rotate back the opposite direction until color is found or limit reached
 		waitUntil((getColorReflected(colorSensor) <= targetColor + 10 && getColorReflected(colorSensor) >= targetColor - 10)  || abs(getMotorEncoder(rightMotor))>= 2*encoderTarget); //Error <= 15 && Error >=  -15
-		startTask(stopAndResetMotors);
+		stopAndResetMotors();
 
+		//if the target color has been found, rotate back straight and finish calibration
 		if ((getColorReflected(colorSensor) <= targetColor + 10 && getColorReflected(colorSensor) >= targetColor - 10)){
 			setMotorSpeed(rightMotor, 5); //rotate left
 			setMotorSpeed(leftMotor, -5);
 			waitUntil(abs(getMotorEncoder(rightMotor))>= encoderTarget);
-			startTask(stopAndResetMotors);
+			stopAndResetMotors();
 			return true; //line is on right
 		}
 		else {
-				startTask(stopAndResetMotors);
+			//if no color was found on first sweep, reset to centre and widen range
+				stopAndResetMotors();
 				setMotorSpeed(rightMotor, 5); //rotate left
 				setMotorSpeed(leftMotor, -5);
 				waitUntil(abs(getMotorEncoder(rightMotor))>= encoderTarget);
-				startTask(stopAndResetMotors);
+				stopAndResetMotors();
 				encoderTarget += 90;
 				if (encoderTarget >= 360){
-					startTask(stopAndResetMotors);
+					stopAndResetMotors();
 					return true; //assume line is on left
 				}
 		}
@@ -110,51 +118,88 @@ bool calibration(){
 	return true;
 }
 
+
+bool fork () {
+	//calculate the target distance from the start point and set an encoder end condition based on that value
+	//(given an error of about 50 encoder counts)
+	short lengthOfTrack = 1.42;
+	int encoderError = 300;
+	short encoderForkDistance = lengthOfTrack/(PI*wheelDiameter)*360+encoderError;
+
+	if (abs(getMotorEncoder(leftMotor)) > encoderForkDistance || abs(getMotorEncoder(rightMotor)) > encoderForkDistance){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+
+
+
 task main(){
 
 	pickUp();
+	//calibrate says line is on right, set motor control variables accordingly
+	if (calibration() == true){
+		setLEDColor(ledGreen);
+		displayCenteredTextLine(3, "The Line is on My Right");
+		allignmentVal = 1;
+		rightMtrSpd = 0;
+		leftMtrSpd = 10;
 
-	//if (calibration() == true){
-	//	setLEDColor(ledGreen);
-	//	displayCenteredTextLine(3, "The Line is on My Right");
-	//	allignmentVal = 1;
-	//	rightMtrSpd = 0;
-	//	leftMtrSpd = 10;
+	}
+	//calibrate says line is on left, set motor control variables accordingly
+	else {
+		setLEDColor(ledRed);
+		displayCenteredTextLine(3, "The Line is on My Left");
+		allignmentVal = -1;
+		rightMtrSpd = 10;
+		leftMtrSpd = 0;
+	}
+	setMotorTarget(leftMotor, 480,50);
+	setMotorTarget(rightMotor, 480,50);
+	waitUntilMotorStop(leftMotor);
 
-	//}
-	//else {
-	//	setLEDColor(ledRed);
-	//	displayCenteredTextLine(3, "The Line is on My Left");
-	//	allignmentVal = -1;
-	//	rightMtrSpd = 10;
-	//	leftMtrSpd = 0;
-	//}
+	stopAndResetMotors();
 
 	getColorRGB(colorSensor, red, blue, green);
 
-	allignmentVal = -1;
-	rightMtrSpd = speed;
-	leftMtrSpd = 0;
 
+	while((red / (blue+1) > 4 && red / (green+1) > 4) == false){ //while not red
 
-	while((red / (blue+1) > 2 && red / (green+1) > 2) == false){ //while not red
-		while(red < targetColor - 5 && blue < targetColor - 5){ //When Line is on right -> this is for left turns
-			setMotorSpeed(rightMotor, speed*allignmentVal);				//When Line is on left -> this is for right turns
+		if(red < targetColor - 5 && blue < targetColor - 5){ //to black turn away from line
+			//When Line is on right -> this is for left turns
+			//When Line is on left -> this is for right turns
+			setMotorSpeed(rightMotor, speed*allignmentVal);
 			setMotorSpeed(leftMotor, -speed*allignmentVal);
 			getColorRGB(colorSensor, red, blue, green);
 		}
-		while(red > targetColor + 5 && blue > targetColor + 5){ //too white
+		else if(red > targetColor + 5 && blue > targetColor + 5){ //too white
+			//When Line is on right -> this is for right turns
+			//When Line is on left -> this is for left turns
 			setMotorSpeed(rightMotor, rightMtrSpd);
 			setMotorSpeed(leftMotor, leftMtrSpd);
 			getColorRGB(colorSensor, red, blue, green);
 				}
-		while(red > targetColor -5 && red < targetColor + 5 && blue > targetColor - 5 && blue < targetColor + 5 ){ //on the edge
+		else if(red > targetColor -5 && red < targetColor + 5 && blue > targetColor - 5 && blue < targetColor + 5 ){ //on the edge
+			//go straight, dont turn
 			setMotorSpeed(rightMotor, speed);
 			setMotorSpeed(leftMotor, speed);
 			getColorRGB(colorSensor, red, blue, green);
 			}
 		getColorRGB(colorSensor, red, blue, green);
+			/*
+			this section is to stop when at the fork in the road and place the box for challenge 5
+			comment out below function if not needed
+			*/
+			if (fork()){
+				break;
+			}
+
 	}
+
+
 	putDown();
 
 }
