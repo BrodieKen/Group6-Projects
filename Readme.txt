@@ -2,19 +2,10 @@ MSE 110 Group 6
 Line Tracking Robot
 Brodie Milne
 Prashant Kumar
-Khail Alibaih
+Khail Alibhai
 
 what can your robot do?
-  This robot can follow lines in two different methods. 
-  method one follows the "jiggle" technique, where the robot turns towards the line until it sees it and then away until it doesnt and jiggles along the line. 
-  This method was further optimized by having a third case where if the edge of the line is detected, then it drives straight at a higher speed
-  Method 2 follows a PID control where it takes an error calculation from the line and adjusts both motor values at once proportional to its distance and direction from the line.
-  This robot can detect a box and grab it using a sonar sensor. it will grab anything <3cm away from the robot
-  Auto Calibration for which side of the line is being tracked. this functions on a sweeping motion, where each pass will grow its range 
-  further until it finds the line, upon which it willbegint o follow the detected line
-  Finally, it can also deliver the collected box in two ways.
-  The first way uses RGB color values for detecting when a RED drop off location is found
-  The second way uses a conversion from measured distance (in meters) to encoder values to drop the box at any point (split road)
+In order to challenge ourselves, the team decided to line track using a PID loop instead of the simpler "jiggle" technique. We chose PID as it is a common algorithm found in engineering and none of us had ever used one before. Our Robot can effectively follow a line, tracking either the right or left edge while also picking up and delivering cargo to a variety of destinations. THe robot Line tracks using a PID algorithm, taking error as the difference in color sensed off of the edge of black and white. To pick up cargo, the robot will drive in a straight line until it detects an object (crate) in front of it. It detects the object using a sonar sensor and lowers an arm to collect the cargo. The final destination for the cargo is to be placed in a red "end zone" where the same color sensor used during movment and PID waits until the color red is detected intiating a delivery sequence and ending the program. If the cargo needs to be delivered in any other zone, the user can define a distance using encoder values. The final thing the robot is capable of doing is automatically determing the side of the line it should follow through a "calibration" mode. This calibration mode sweeps left and right growing its range of view until it detects a black line that it can follow.
   
 what can't your robot do?
   PID control is very inconsistent in the real robot
