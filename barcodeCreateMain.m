@@ -10,8 +10,6 @@ msg = input("Secret Message(numbers only): ","s") ;
 
 % seperate the message into indexed positons for each letter
 code = 1:length(msg);
-for l = length(msg)
-    val = barcodeLines(str2double(msg(l))+1);
-    code(l) = val;
+for l = 1:length(msg)
+    code(l) = barcodeLines(str2double(msg(l))+1);   
 end
-
