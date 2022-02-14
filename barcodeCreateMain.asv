@@ -6,12 +6,11 @@ clear;
 barcodeLines = ["0000","1000","0100","1100","0010","1010","0110","1110","0001","1001","0101","1101","0011","1011","0111","1111"];
 
 % receive message from user
-msg = input("Secret Message(numbers only): ","s") ;
+msg = input("Secret Message(numbers only): ") ;
 
 % seperate the message into indexed positons for each letter
 code = 1:length(msg);
 for l = length(msg)
-    val = barcodeLines(str2double(msg(l))+1);
-    code(l) = val;
+    code(l) = barcodeLines();
 end
 
