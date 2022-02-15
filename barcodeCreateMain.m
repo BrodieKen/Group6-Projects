@@ -1,35 +1,35 @@
-clc;
-clear;
+%% create a specificed size image
+% 0 is narrow bar with large white
+% 1 is thick bar with thin white
 
-% define reference arrays for encoding the message plessey standard uses
-% numbers only
-barcodeLines = ["20000","21000","20100","21100","20010","21010","20110","21110","20001","21001","20101","21101","20011","21011","20111","21111"];
+height = 1080;
+width = 1920;
+clarity = 0;
 
-% receive message from user
-msg = input("Secret Message(Hex Number): ","s") ;
-
-
-%line width and spacing in units
-thinLine = 1;   %represented as 0 in code
-thickLine = 3*thinLine;  %represented as 1 in code
-totalLineSpace = thinLine + thickLine; %total space allocated for a single part of a number
-
+A = rand(height, width); %create a random image of specificed size (matrix)
+num = flip(dec2bin(input("Enter Number: "),4));
+x = 1;
+totalLineSpace = width/4;
+thinLine = totalLineSpace/4;
+thickLine = totalLineSpace-thinLine;
 
 
-% seperate the message into indexed positons for each letter
-%convert that number/letterr to its binary equivalent from lookup table
-code = 1:length(msg);
-for l = 1:length(msg)
-    code(l) = string(barcodeLines(hex2dec(msg(l))+1));   
+for i = 1:length(num)
+    if num(i) == '0'
+        A(:,x:x+thinLine) = (clarity)*rand;
+        A(:,x+thinLine:x+totalLineSpace) = 1;
+        x = x+totalLineSpace;
+    elseif num(i) == '1'
+        A(:,x:x+thickLine) = (clarity)*rand;
+        A(:,x+thickLine:x+totalLineSpace) = 1;
+        x = x+totalLineSpace;
+    end
+    
 end
 
+A(1:10,:) = clarity;
+A(height-10:height,:) = clarity;
+A(:,1:10) = clarity;
+A(:,width-20:width) = clarity;
 
-xPos = 0;
-
-xPos = drawNum(xPos,
-%plot vertical lines for barcode
-for i = 1:length(code)  %for each number in the code
-    currentNum = num2str(code(i));  % specify the current number
-    hold on
-    xPos = drawNum(xPos,currentNum,thickLine,thinLine,totalLineSpace);
-end
+imwrite(A,'code.jpg')
