@@ -3,7 +3,7 @@ clear;
 
 % define reference arrays for encoding the message plessey standard uses
 % numbers only
-barcodeLines = ["0000","1000","0100","1100","0010","1010","0110","1110","0001","1001","0101","1101","0011","1011","0111","1111"];
+barcodeLines = ["20000","21000","20100","21100","20010","21010","20110","21110","20001","21001","20101","21101","20011","21011","20111","21111"];
 
 % receive message from user
 msg = input("Secret Message(numbers only): ","s") ;
@@ -26,25 +26,21 @@ y = [0,3];
 x = [0,0];
 
 
-%first code spot
-
+%plot vertical lines for barcode
 for i = 1:length(code)
-    for j = 1:length(code(i))
-        currentNum = code(i);
-        
-%         plot(x,y,'Linewidth',thinLine)
-%            drawnow
-%             x = x + totalLineSpace;
+    currentNum = num2str(code(i));
+    for j = 2:length(currentNum)
 
-
-        if currentNum(j) == 0
+        if currentNum(j) == '0'
+%             plot([0,2],[2,3])
             hold on
-            plot(x,y,'Linewidth',thinLine)
+            plot(x,y,'black','Linewidth',thinLine)
             drawnow
             x = x + totalLineSpace;
-        elseif  currentNum(j) == 1
+        elseif  currentNum(j) == '1'
+%             plot([2,3],[0,2])
             hold on
-            plot(x,y,'Linewidth',thickLine)
+            plot(x,y,'black','Linewidth',thickLine)
             drawnow
             x = x + totalLineSpace;
         end
