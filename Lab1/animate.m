@@ -20,6 +20,7 @@ cX = r1;
 plot([oX,aX],[oY,aY],'-');
 plot([aX,bX],[aY,bY],'-');
 plot([bX,cX],[bY,cY],'-');
+axis([-3 8 -6.5 6.5])
 drawnow;
 
 end

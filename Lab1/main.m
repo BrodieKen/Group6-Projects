@@ -7,7 +7,26 @@ r1 = 7;
 r2 = 3;
 r3 = 8;
 r4 = 6;
- 
+
+%% Graphical Method
+angles = 0:0.01:2*pi;
+
+fxn = funct(angles,pi/3);
+
+plot(angles,fxn,[0,2*pi],[0,0]);
+
+%% Bisection Method
+err = 10^-6;
+[theta4, iterations] = bisection(4.0,4.2, err, pi/3);
+
+
+%% Secant Method
+
+err = 10^-6;
+[~,theta4, iterations] = secant(1.1,1.3, err,pi/3);
+
+%% Implimentation
+
 range = [0:pi/36:2*pi];
 i = 1;
 
@@ -34,7 +53,6 @@ plot(rad2deg(range), rad2deg(theta4A), rad2deg(range), rad2deg(theta3A));
 xlabel('Theta2 (deg)') 
 legend('Theta4 (deg)','Theta3 (deg)');
 title('Mechanism A');
-
 
 subplot(2,2,3);
 plot(rad2deg(range), rad2deg(theta4B), rad2deg(range), rad2deg(theta3B));
