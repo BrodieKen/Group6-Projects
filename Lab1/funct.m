@@ -1,4 +1,6 @@
 function result = funct(x, theta2)
+%this function calculates the result of thefunction given in the lab manula
+%for LAB 1
     r1 = 7;
     r2 = 3;
     r3 = 8;
