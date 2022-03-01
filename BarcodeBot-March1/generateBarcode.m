@@ -11,17 +11,14 @@ function generateBarcode(intValue, noise, height, width)
     noise = noise / 100;
 
     x = 0;
-    totalLineSpace = width/length(binValue);
-    thinLine = totalLineSpace/length(binValue);
-    thickLine = totalLineSpace-thinLine;
+    totalLineSpace = floor(width/length(binValue));
+    thinLine = floor(totalLineSpace/4);
+    thickLine = floor(totalLineSpace-thinLine);
     
     for i = 1:length(binValue)
         if binValue(i) == '0'
-            %A(:,x:x+thinLine) = 0; %Black
             A(:,x+thinLine:x+totalLineSpace) = 1; %White
-
         elseif binValue(i) == '1'
-            %A(:,x:x+thickLine) = 0; %Black
             A(:,x+thickLine:x+totalLineSpace) = 1; %White
         end
         x = x+totalLineSpace;

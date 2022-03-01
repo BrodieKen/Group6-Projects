@@ -4,7 +4,7 @@ clc;
 %% Barcode Generation
 height = 1080;
 width = 1920;
-noise = 88;
+noise = 40;
 
 num = input("Enter Number: ");
 
