@@ -10,22 +10,26 @@ function x = readBarcode(encoderData)
     
     %Translate data to Binary Number by comparing first encoder value of
     %bit to the threshold.
-    binValue = "";
+    binValue = [];
+    j = 1;
     for i = 1:2:(length(encoderData) - 1)
         if encoderData(i) > threshold
-            binValue = binValue + "1";
+            binValue(j) = 1;
         else
-            binValue = binValue + "0";
+            binValue(j) = 0;
         end
+        j = j+1;
     end
 
     %Check LSB
     if encoderData(end) > threshold
-        binValue = binValue + "1";
+        binValue(j) = 1;
     else
-        binValue = binValue + "0";
+        binValue(j) = 0;
     end
+    
+    binValue = flip(binValue);
 
     %Convert binary value to decimal.
-    x = bin2dec(flip(binValue));
+    x = uint8(bin2dec(sprintf('%d',binValue)));
 end
