@@ -1,4 +1,3 @@
-
 function MSE_211_Lab_2_path_generation
 close all; clear all;
 % This is the main file where the inputs and type of problem are defined
@@ -127,12 +126,14 @@ gamma(3)=x(7);
 
 
 for i = 1:1:3
-   %WRITE THE RELATIVE EQUATIONS FOR EACH PRECISION POINT
+   gx(i) = r4x +  r3bx + inputs.deltax(i) - r3bx*cos(alpha(i)) + r3by*sin(alpha(i)) - r4x*cos(gamma(i)) +r4y*sin(gamma(i));
+   gy(i) = r4y + r3by + inputs.deltay(i) - r3by*cos(alpha(i)) -r3bx*sin(alpha(i)) ...
+        -r4y*cos(gamma(i)) - r4x*sin(gamma(i));
 end
 
 
 %WRITE YOUR OBJECTIVE FUNCTION 
-
+G = sqrt(gx(1).^2 + gx(2).^2 + gx(3).^2 + gy(1).^2 + gy(2).^2 + gy(3).^2);
 end
 
 function animation(Lx,Rx,LFval,RFval)

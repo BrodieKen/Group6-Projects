@@ -74,7 +74,7 @@ for i = 1:1:3
         + r4y*(cos(inputs.gamma(i))-1) + r4x*sin(inputs.gamma(i));
 end
 %WRITE YOUR OBJECTIVE FUNCTION 
-
+F = sqrt(fx(1).^2 + fx(2).^2 + fx(3).^2 + fy(1).^2 + fy(2).^2 + fy(3).^2);
 end
 
 function animation(x,Fval)
