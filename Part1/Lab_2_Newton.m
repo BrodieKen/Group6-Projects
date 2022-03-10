@@ -1,7 +1,7 @@
 function [X,traj,f,k,Err] = Lab_2_Newton(x0,tol)
     k = 0; ea = 1;
     X = x0; traj=[];
-    f = Lab_2_Fun(X);
+    f(1) = Lab_2_Fun(X);
     Err=NaN;
     while ea > tol
         grad = Lab_2_Grad(X);
@@ -12,6 +12,6 @@ function [X,traj,f,k,Err] = Lab_2_Newton(x0,tol)
         ea = norm(xnew-X); %Evaluate error
         Err = [Err ea];
         X = xnew;
-        f = Lab_2_Fun(X);
+        f(2,1) = Lab_2_Fun(X);
     end
 end
