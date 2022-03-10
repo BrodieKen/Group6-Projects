@@ -8,7 +8,7 @@ f = (x1.^2 + y1 - 11).^2 + (x1 + y1.^2 - 7).^2;
 % Plot surface
 surface = figure; figure(surface);
 surf(x1,y1,f); shading interp;
-x0 = [0; 0]; %Initial Guess
+x0 = [4; -4]; %Initial Guess
 
 %Call Methods (Use % before each line to comment the methods you are not testing)
 
@@ -18,11 +18,9 @@ x0 = [0; 0]; %Initial Guess
 %options = optimoptions('fminunc','GradObj','on','Algorithm','trust-region');
 %[X,FVAL,EXITFLAG,OUTPUT] = fminunc(@Lab_2_Fun,x0);
 
-
-
 % Add trajectory for finding minima (3D plot)
 hold on
-plot3(traj(:,1), traj(:,2), Z(:,1) ,'-k+')
+plot3(traj(1,:), traj(2,:), Z ,'-k+')
 
 %Plot contour (2D plot)
 contour_graph = figure; figure(contour_graph);

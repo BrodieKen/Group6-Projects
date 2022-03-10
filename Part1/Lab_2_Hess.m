@@ -1,7 +1,7 @@
 function hess = Lab_2_Hess(vect)
   
     syms x y;
-    f = (x.^2 + y.^2 - 11).^2 + (x + y.^2 - 7).^2;
+    f = (x.^2 + y - 11).^2 + (x + y.^2 - 7).^2;
 
     dx = diff(f, x);
     dy = diff(f, y);
