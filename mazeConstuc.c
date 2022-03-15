@@ -30,28 +30,28 @@ task main()
 
 
 
-void simulateMaze(){
-	//check each item in the array with each position, if 1 draw line
-	int cellX = 0;
-	int cellY = 0;
-	for(int row = 0; row < 6; row++){
-		for( int column = 0; column < 8; column++){
-			if (Maze[row][column].northWall == 1){
-				drawLine(row, cellSizeY + row, row + cellSizeX, cellSizeY);
+//void simulateMaze(){
+//	//check each item in the array with each position, if 1 draw line
+//	int cellX = 0;
+//	int cellY = 0;
+//	for(int row = 0; row < 6; row++){
+//		for( int column = 0; column < 8; column++){
+//			if (Maze[row][column].northWall == 1){
+//				drawLine(row, cellSizeY + row, row + cellSizeX, cellSizeY);
 
-			}
-			if (Maze[row][column].eastWall == 1){
-				//draw lines
-			}
-			if (Maze[row][column].southWall == 1){
-				//draw line
-			}
-			if (Maze[row][column].westWall == 1){
-				//draw line
-			}
-		}
-	}
-}
+//			}
+//			if (Maze[row][column].eastWall == 1){
+//				//draw lines
+//			}
+//			if (Maze[row][column].southWall == 1){
+//				//draw line
+//			}
+//			if (Maze[row][column].westWall == 1){
+//				//draw line
+//			}
+//		}
+//	}
+//}
 
 
 
