@@ -13,9 +13,13 @@ b = [5 0 0 0 0 0 0 0 0 0]';
 
 x = A \ b;
 
-% idk what this mean
-% c = A.*x - b;
-% norm(c)
+%compare experimental and theoretical
+xe = [4.6212 3.7305 3.3963 2.7272 0.0001827 0.0000898 ...
+        0.0000337 0.0000343 0.0000931 0.0001827]';   %experimental results of the voltges and currents
+
+    % difference between experimental results and actual results
+c = A*xe - x;
+error = norm(c)
 
 normFrobA = cond(A);
 normOneA = cond(A, 1);
