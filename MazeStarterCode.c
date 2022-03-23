@@ -41,6 +41,7 @@ typedef struct{
 	int eWall;
 	int sWall;
 	int wWall;
+
 }cell;
 
 cell maze[numOfRows][numOfCols];
@@ -48,8 +49,6 @@ cell maze[numOfRows][numOfCols];
 int pathIndex = 0;
 int pathTaken[30];
 int directionMarix[4][4];
-
-
 
 
 void buildOuterBorders();
@@ -67,6 +66,9 @@ void goFwdIRL();
 void turnRightIRL();
 void checkDirection();
 
+task virtualFollow();
+
+
 task main(){
 	//initialize maze and solve virtually
 	for (int i = 0; i<30;i++){
@@ -74,13 +76,13 @@ task main(){
 	}
 	buildOuterBorders();
 	MazeSim();
-	refreshScreen();
+	refreshScreen(robHeading);
 	while(robRow!= targetRow || robCol != targetCol){
 		solveMazeRWF();
-		refreshScreen();
+		refreshScreen(robHeading);
 		//sleep(250);
 	}
-	refreshScreen();
+	refreshScreen(robHeading);
 	optimizePath();
 	sleep(1000);
 
@@ -89,7 +91,7 @@ task main(){
 	populateDirectionMatrix();
 	resetGyro(gyroSensor);
 	sleep(500); //wait half a second to get heading 0
-
+	startTask(virtualFollow);
 	for (int i = 0; i < pathIndex; i++){
 		if (pathTaken[i] != 9) {
 			checkDirection();
@@ -118,6 +120,29 @@ task main(){
 	*/
 }
 
+
+
+
+//===Virtual following of the physical robot===//
+task virtualFollow(){\
+	robRow = startRow;	//increment robRow and robCol whenever the current spot in the path changes
+	robCol = startCol;
+	//current Path index is the current spot the robot is at in the optimized path
+	while(currentPathIndex < pathIndex){
+		checkDirection();
+		switch(pathTaken[pathIndex]){
+			case 0: robRow++;break;
+			case 1: robCol++;break;
+			case 2: robRow--;break;
+			case 3: robCol--;break;
+			default: break;
+		}
+		refreshScreen(orientation);
+	}
+	//get the orientation
+	//get the position in the matrix
+	//display the position and refresh screen
+}
 
 
 
@@ -279,18 +304,16 @@ void buildOuterBorders(){
 	}
 }
 
-void refreshScreen(){
+void refreshScreen(int robDirect){
 	eraseDisplay();
 	gridDraw();
-	drawBot();
+	drawBot(robDirect);
 }
 
 
 //virtual Motion functions//
 void goFwd(){
-
 	//wait1Msec(1000);  // waste some time to simulate motion
-
 	if (robHeading==0)	{   // Going Fwd North
 		robRow++;
 	}
@@ -373,7 +396,7 @@ void gridDraw(){
 }
 
 //=====================================================================
-void drawBot(){
+void drawBot(int robDirect){
 	int RobotXpixelPos=0;
 	int RobotYpixelPos=0;
 
@@ -391,7 +414,7 @@ void drawBot(){
 		RobotYpixelPos=(2*robRow+1)*screenHeight/8;
 	}
 
-	switch(robHeading){
+	switch(robDirect){
 			case 0: displayStringAt(RobotXpixelPos,RobotYpixelPos,"^");	break; // Facing North
 			case 1: displayStringAt(RobotXpixelPos,RobotYpixelPos,">"); break; // Facing East
 			case 2: displayStringAt(RobotXpixelPos,RobotYpixelPos,"V"); break; // Facing South
