@@ -26,7 +26,12 @@
 - get accurate encoder value for gridLength
 - display finish message
 - tweak arrayLength and loop iterations... maybe find a way to store the length of the optimal path?
+*/
 
+/*
+Additions/Changes made march 28
+- added input from the robot screen for start and target cell
+- added a new part of the matrix class for target colour
 */
 const int screenHeight = 127;
 const int screenWidth  = 177;
@@ -54,6 +59,7 @@ typedef struct{
 	int eWall;
 	int sWall;
 	int wWall;
+	int colorThreshold;
 
 }cell;
 
@@ -79,6 +85,7 @@ void goFwdIRL();
 void turnRightIRL();
 void checkDirection();
 void lineTrack(int allignmentVal, int turnHeading);
+void inputStartAndEnd();
 
 task virtualFollow();
 
@@ -88,6 +95,7 @@ task main(){
 	for (int i = 0; i<arrayLength;i++){
 		pathTaken[i] = 9;
 	}
+	inputStartAndEnd();	//Comment out for manual input from the code for start and end positions
 	buildOuterBorders();
 	MazeSim();
 	refreshScreen();
@@ -146,6 +154,9 @@ task main(){
 	checkDirection();
 	refreshScreen();
 }
+
+
+
 
 void lineTrack(int allignmentVal, int turnHeading){
 	getColorRGB(colorSensor, red, blue, green);
@@ -309,6 +320,64 @@ void solveMazeRWF(){
 }
 
 //mazze building functions//
+void inputStartAndEnd(){
+	int num = 0;
+	int settings = 0;
+	int buttonState = 0;
+	while(settings < 5){
+		if(getButtonPress(buttonUp) == true){
+			num++;
+		}
+		else if(getButtonPress(buttonDown) == true){
+			num--;
+		}
+		switch(settings){
+			case 0:	//robot start row
+				if(num>7){num = 0;}
+				else if(num<0){num = 7;}
+				startRow = num;
+				break;
+			case 1:	//robot start col
+				if(num>9){num = 0;}
+				else if(num<0){num = 9;}
+				startCol = num;
+				break;
+			case 2:	//robot target row
+				if(num>7){num = 0;}
+				else if(num<0){num = 7;}
+				targetRow = num;
+				break;
+			case 3:	//robot target col
+				if(num>7){num = 0;}
+				else if(num<0){num = 7;}
+				targetCol = num;
+				break;
+			case 4:	//confirm ready to begin
+				waitForButtonPress();
+        settings++;
+        break;//when enter button released, switch to next setting
+			default: break;
+		}
+		displayTextLine(1, "Robot Start Row: %d",startRow);
+		displayTextLine(3, "Robot Start Column: %d",startCol);
+		displayTextLine(5, "Robot Target Row: %d",targetRow);
+		displayTextLine(7, "Robot Target Column: %d",targetCol);
+
+		if (getButtonPress(buttonEnter)== 1 && buttonState == 0){
+			settings++;	//when enter button released, switch to next setting
+			buttonState = 1;
+		}
+		else if(getButtonPress(buttonEnter)== 0 && buttonState == 1){
+			buttonState = 0;
+		}
+		wait1Msec(100);
+	}
+}
+
+
+
+
+
 void MazeSim(){
 
 	//column 0
