@@ -59,7 +59,7 @@ typedef struct{
 	int eWall;
 	int sWall;
 	int wWall;
-	int colorThreshold;
+	int color;
 
 }cell;
 
@@ -161,6 +161,7 @@ task main(){
 void lineTrack(int allignmentVal, int turnHeading){
 	getColorRGB(colorSensor, red, blue, green);
 	wait1Msec(100);
+	//targetColor = maze[currentRow][currentCol].color;	//idk what cell we are in at a given time
 	while(orientation != turnHeading){ //stop after ~90deg turn
 
 		if(red < targetColor - 5 && blue < targetColor - 5){ //to black turn away from line
@@ -462,6 +463,17 @@ void MazeSim(){
 	maze[4][8].sWall = maze[3][8].nWall = 1;
 	maze[3][8].sWall = maze[2][8].nWall = 1;
 	maze[2][8].sWall = maze[1][8].nWall = 1;
+
+	for(int i = 0; i <numOfCols;i++){
+		for(int j =0; j<numOfRows;j++){
+			if(i>4){
+				maze[j][i].color = 40; //yellow
+			}
+			else{
+				maze[j][i].color = 5; //black
+			}
+		}
+	}
 }
 
 void buildOuterBorders(){
