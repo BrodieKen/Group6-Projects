@@ -3,24 +3,25 @@
 
 const int screenHeight = 127;
 const int screenWidth  = 177;
-const int numOfRows = 7;
-const int numOfCols = 9;
+const int numOfRows = 8;
+const int numOfCols = 10;
 
 int startRow = 3;
 int startCol = 1;
-int targetRow = 4;
-int targetCol = 8;
+int targetRow = 0;
+int targetCol =9;
 int robHeading = 0; // 0=North, 1=East, 2=South, 3=West
 int robRow = startRow;
 int robCol = startCol;
-int gridLength = 330;
-int turnTarget = 65;//150;	//found through experimentation rather than calulcation
-float motorSpeed = 15;
+int gridLength =	654; //328;
+int turnTarget = 58;//150;	//found through experimentation rather than calulcation
+float motorSpeed = 25;
 int turnSpeed = 5;
 const int arrayLength = 100;
-int targetColor = 13; //set based on starting point (black or yellow)
+int targetColor = 15; //set based on starting point (black or yellow) 21 yellow or 15 black
 int color;
 int alignmentVal = 1;
+bool calcStatus = false;
 
 typedef struct{
 	int nWall;  // 0 = door, 1 = wall
@@ -58,6 +59,9 @@ void inputStartAndEnd();
 
 
 task main(){
+
+	setLEDColor(ledRedPulse);
+
 	//initialize maze and solve virtually
 	for (int i = 0; i<arrayLength;i++){
 		pathTaken[i] = 9;
@@ -76,6 +80,9 @@ task main(){
 	populateDirectionMatrix();
 	sleep(1000);
 
+	playSound(soundDownwardTones);
+	setLEDColor(ledOrangePulse);
+	calcStatus = true;
 
 	//follow optimized path
 	pathIndex = 0;
@@ -83,14 +90,59 @@ task main(){
 	robCol = startCol;
 	robHeading = 0;
 	refreshScreen();
+
+	//orient to starting line
+	if(robHeading != pathTaken[pathIndex]){
+		int rotateTo = directionMarix[robHeading][pathTaken[pathIndex]];
+		for(int j = 0; j< abs(rotateTo);j++){
+			if(rotateTo > 0){	//right
+				resetMotorEncoder(leftMotor);
+				resetMotorEncoder(rightMotor);
+				setMotorTarget(leftMotor,150,turnSpeed);
+				setMotorTarget(rightMotor,-150,turnSpeed);
+				waitUntilMotorStop(leftMotor);
+				waitUntilMotorStop(rightMotor);
+				resetMotorEncoder(leftMotor);
+				resetMotorEncoder(rightMotor);
+
+				switch(robHeading){
+				case 0: robHeading = 1;break;
+				case 1: robHeading = 2;break;
+				case 2: robHeading = 3;break;
+				case 3: robHeading = 0;break;
+				default: break;
+				}
+			}
+			else if(rotateTo <0){	//left
+				resetMotorEncoder(leftMotor);
+				resetMotorEncoder(rightMotor);
+				setMotorTarget(leftMotor,-150,turnSpeed);
+				setMotorTarget(rightMotor,150,turnSpeed);
+				waitUntilMotorStop(leftMotor);
+				waitUntilMotorStop(rightMotor);
+				resetMotorEncoder(leftMotor);
+				resetMotorEncoder(rightMotor);
+
+				switch(robHeading){
+				case 0: robHeading = 3;break;
+				case 1: robHeading = 0;break;
+				case 2: robHeading = 1;break;
+				case 3: robHeading = 2;break;
+				default: break;
+				}
+			}
+		}
+	}
+
+	//folow lines from path Taken
 	while(robRow != targetRow || robCol != targetCol){
 
-		if (robCol == 4 && pathTaken[pathIndex] == 1){
+		if (robCol == 4 && pathTaken[pathIndex] != 3){
 			targetColor = 21; //yellow value
 			alignmentVal = -1;
 		}
-		else if (robCol == 4 && pathTaken[pathIndex] != 1) {
-			targetColor = 13; //black value
+		else if (robCol == 4 && pathTaken[pathIndex] == 3) {
+			targetColor = 15; //black value
 			alignmentVal = 1;
 		}
 
@@ -111,6 +163,23 @@ task main(){
 		}
 		refreshScreen();
 	}
+
+	//The robot will sound a different tone for 2 seconds, or indicate on the robot screen when it believes that it has reached the target coordinates.
+	playSound(soundFastUpwardTones);
+	playSound(soundBlip);
+	playSound(soundBeepBeep);
+	eraseDisplay();
+	while(true) {
+		displayCenteredBigTextLine(5, "Destination");
+		displayCenteredBigTextLine(7, "Reached");
+		setLEDColor(ledGreen);
+		wait10Msec(50);
+		setLEDColor(ledOrange);
+		eraseDisplay();
+		wait10Msec(50);
+	}
+
+
 }
 
 ///////////////////////////////////////////
@@ -134,7 +203,7 @@ task main(){
 
 /*----Motion Functions----*/
 void goFwdIRL(){
-	float pConst = 0.8;
+	float pConst = 0.75;
 	float iConst = 0;
 	float dConst = 0;
 	float Error = 0;
@@ -150,7 +219,7 @@ void goFwdIRL(){
 	resetMotorEncoder(rightMotor);
 
 
-	while ((getMotorEncoder(leftMotor) + getMotorEncoder(rightMotor))/2 < gridLength){
+	while ((getMotorEncoder(leftMotor) + getMotorEncoder(rightMotor))/2 < (gridLength)*(0.6)){
 
 		//Standard PID loop algorithm. compares current value of color sensor to the desired value of color sensor and adjusts motor speeds proportionally
 
@@ -185,8 +254,8 @@ void goFwdIRL(){
 	}
 	resetMotorEncoder(leftMotor);
 	resetMotorEncoder(rightMotor);
-	setMotorTarget(leftMotor,gridLength,motorSpeed);
-	setMotorTarget(rightMotor,gridLength,motorSpeed);
+	setMotorTarget(leftMotor,gridLength*0.4,motorSpeed);
+	setMotorTarget(rightMotor,gridLength*0.4,motorSpeed);
 	waitUntilMotorStop(leftMotor);
 	waitUntilMotorStop(rightMotor);
 	resetMotorEncoder(leftMotor);
@@ -194,11 +263,11 @@ void goFwdIRL(){
 
 
 	switch(robHeading){
-		case 0: 	robRow++;break;
-		case 1:   robCol++;break;
-		case 2:   robRow--;break;
-		case 3:   robCol--;break;
-		default: break;
+	case 0: 	robRow++;break;
+	case 1:   robCol++;break;
+	case 2:   robRow--;break;
+	case 3:   robCol--;break;
+	default: break;
 	}
 }
 
@@ -216,7 +285,7 @@ void turnRightIRL(){
 	resetMotorEncoder(leftMotor);
 	resetMotorEncoder(rightMotor);
 
-	while((abs(getMotorEncoder(leftMotor))<turnTarget&&abs(getMotorEncoder(leftMotor))<turnTarget)||getColorReflected(colorSensor)!=targetColor){
+	while((abs(getMotorEncoder(leftMotor))<turnTarget&&abs(getMotorEncoder(leftMotor))<turnTarget)||(getColorReflected(colorSensor) > targetColor + 2 || getColorReflected(colorSensor) < targetColor - 2)){
 		//might be able to make something of this.
 		//was attempting to proportionally decrease speed as we approach were we think the line is
 		//color = getColorReflected(colorSensor);
@@ -244,14 +313,14 @@ void turnRightIRL(){
 }
 
 void turnLeftIRL(){
-/*
+	/*
 	One issue with left turns is that it can under turn causing it to miss algin with the next straight part.
 	one way around this is to left turn in two steps
-		1. turn way past the line as you know a rough estimate as to where the line should be
-		2. turn right until you find the line again
+	1. turn way past the line as you know a rough estimate as to where the line should be
+	2. turn right until you find the line again
 	one issue i have with this is the edge case of over turning not actually aligning
 	you on the side of the line you expect to be aligned on. Thus i didnt do that and just have it hope for the best
-*/
+	*/
 
 	resetMotorEncoder(leftMotor);
 	resetMotorEncoder(rightMotor);
@@ -423,87 +492,107 @@ void inputStartAndEnd(){
 void MazeSim(){
 
 	//column 0
+	maze[7][0].sWall = maze[6][0].nWall = 1;
 	maze[6][0].sWall = maze[5][0].nWall = 1;
 	maze[5][0].sWall = maze[4][0].nWall = 1;
 	maze[4][0].sWall = maze[3][0].nWall = 1;
 	maze[3][0].sWall = maze[2][0].nWall = 1;
 	maze[2][0].sWall = maze[1][0].nWall = 1;
-	maze[1][0].sWall = maze[0][0].nWall = 1;
+	maze[2][0].sWall = maze[0][0].nWall = 1;
 
-	maze[0][0].eWall = maze[0][1].wWall = 1;
-	maze[3][0].eWall = maze[3][1].wWall = 1;
-	maze[5][0].eWall = maze[5][1].wWall = 1;
+	maze[1][0].eWall = maze[1][1].wWall = 1;
+	maze[4][0].eWall = maze[4][1].wWall = 1;
+	maze[6][0].eWall = maze[6][1].wWall = 1;
 
 	//column 1
+	maze[6][1].sWall = maze[5][1].nWall = 1;
 	maze[5][1].sWall = maze[4][1].nWall = 1;
-	maze[4][1].sWall = maze[3][1].nWall = 1;
+	maze[3][1].sWall = maze[2][1].nWall = 1;
 	maze[2][1].sWall = maze[1][1].nWall = 1;
-	maze[1][1].sWall = maze[0][1].nWall = 1;
 
-	maze[6][1].eWall = maze[6][2].wWall = 1;
-	maze[2][1].eWall = maze[2][2].wWall = 1;
+	maze[7][1].eWall = maze[7][2].wWall = 1;
+	maze[3][1].eWall = maze[3][2].wWall = 1;
+	maze[0][1].eWall = maze[0][2].wWall = 1;
 
 	//column 2
+	maze[7][2].eWall = maze[7][3].wWall = 1;
 	maze[6][2].eWall = maze[6][3].wWall = 1;
-	maze[5][2].eWall = maze[5][3].wWall = 1;
-	maze[2][2].eWall = maze[2][3].wWall = 1;
+	maze[3][2].eWall = maze[3][3].wWall = 1;
+	maze[0][2].eWall = maze[0][3].wWall = 1;
 
 	//column 3
+	maze[7][3].sWall = maze[6][3].nWall = 1;
 	maze[6][3].sWall = maze[5][3].nWall = 1;
 	maze[5][3].sWall = maze[4][3].nWall = 1;
-	maze[4][3].sWall = maze[3][3].nWall = 1;
+	maze[3][3].sWall = maze[2][3].nWall = 1;
 	maze[2][3].sWall = maze[1][3].nWall = 1;
 	maze[1][3].sWall = maze[0][3].nWall = 1;
 
+	maze[7][3].eWall = maze[7][4].wWall = 1;
 	maze[6][3].eWall = maze[6][4].wWall = 1;
-	maze[5][3].eWall = maze[5][4].wWall = 1;
-	maze[3][3].eWall = maze[3][4].wWall = 1;
+	maze[4][3].eWall = maze[4][4].wWall = 1;
+	maze[0][3].eWall = maze[0][4].wWall = 1;
 
 	//column 4
-	maze[6][4].sWall = maze[5][4].nWall = 1;
+	maze[7][4].sWall = maze[6][4].nWall = 1;
+	maze[4][4].sWall = maze[3][4].nWall = 1;
 	maze[3][4].sWall = maze[2][4].nWall = 1;
 	maze[2][4].sWall = maze[1][4].nWall = 1;
-	maze[1][4].sWall = maze[0][4].nWall = 1;
 
-	maze[6][4].eWall = maze[6][5].wWall = 1;
-	maze[3][4].eWall = maze[3][5].wWall = 1;
-	maze[0][4].eWall = maze[0][5].wWall = 1;
+	maze[7][4].eWall = maze[7][5].wWall = 1;
+	maze[4][4].eWall = maze[4][5].wWall = 1;
+	maze[1][4].eWall = maze[1][5].wWall = 1;
 
 	//column 5
+	maze[6][5].sWall = maze[5][5].nWall = 1;
 	maze[5][5].sWall = maze[4][5].nWall = 1;
-	maze[4][5].sWall = maze[3][5].nWall = 1;
+	maze[3][5].sWall = maze[2][5].nWall = 1;
 	maze[2][5].sWall = maze[1][5].nWall = 1;
-	maze[1][5].sWall = maze[0][5].nWall = 1;
 
+	maze[7][5].eWall = maze[7][6].wWall = 1;
 	maze[6][5].eWall = maze[6][6].wWall = 1;
 	maze[5][5].eWall = maze[5][6].wWall = 1;
 	maze[4][5].eWall = maze[4][6].wWall = 1;
-	maze[3][5].eWall = maze[3][6].wWall = 1;
+	maze[1][5].eWall = maze[1][6].wWall = 1;
 	maze[0][5].eWall = maze[0][6].wWall = 1;
 
 	//column 6
+	maze[3][6].sWall = maze[2][6].nWall = 1;
 	maze[2][6].sWall = maze[1][6].nWall = 1;
-	maze[1][6].sWall = maze[0][6].nWall = 1;
 
+	maze[7][6].eWall = maze[7][7].wWall = 1;
 	maze[6][6].eWall = maze[6][7].wWall = 1;
 	maze[5][6].eWall = maze[5][7].wWall = 1;
 	maze[4][6].eWall = maze[4][7].wWall = 1;
 	maze[3][6].eWall = maze[3][7].wWall = 1;
-	maze[2][6].eWall = maze[2][7].wWall = 1;
 
 	//column 7
+	maze[1][7].sWall = maze[0][7].nWall = 1;
+
+	maze[7][7].eWall = maze[7][8].wWall = 1;
 	maze[6][7].eWall = maze[6][8].wWall = 1;
-	maze[5][7].eWall = maze[5][8].wWall = 1;
+	maze[4][7].eWall = maze[4][8].wWall = 1;
 	maze[3][7].eWall = maze[3][8].wWall = 1;
-	maze[2][7].eWall = maze[2][8].wWall = 1;
-	maze[0][7].eWall = maze[0][8].wWall = 1;
+	maze[1][7].eWall = maze[1][8].wWall = 1;
+
 
 	//column 8
+	maze[7][8].sWall = maze[6][8].nWall = 1;
 	maze[6][8].sWall = maze[5][8].nWall = 1;
 	maze[5][8].sWall = maze[4][8].nWall = 1;
-	maze[4][8].sWall = maze[3][8].nWall = 1;
 	maze[3][8].sWall = maze[2][8].nWall = 1;
-	maze[2][8].sWall = maze[1][8].nWall = 1;
+	maze[1][8].sWall = maze[0][8].nWall = 1;
+
+	maze[7][8].eWall = maze[7][9].wWall = 1;
+	maze[3][8].eWall = maze[3][8].wWall = 1;
+	maze[1][8].eWall = maze[1][9].wWall = 1;
+
+	//column 9
+	maze[7][9].sWall = maze[6][9].nWall = 1;
+	maze[4][9].sWall = maze[3][9].nWall = 1;
+	maze[3][9].sWall = maze[2][9].nWall = 1;
+	maze[2][9].sWall = maze[1][9].nWall = 1;
+	maze[1][9].sWall = maze[0][9].nWall = 1;
 
 	for(int i = 0; i <numOfCols;i++){
 		for(int j =0; j<numOfRows;j++){
@@ -533,6 +622,9 @@ void refreshScreen(){
 	eraseDisplay();
 	gridDraw();
 	drawBot();
+	if (calcStatus == true) {
+		displayTextLine(1, "Optimal Path Found");
+	}
 }
 
 
@@ -620,17 +712,17 @@ void drawBot(){
 	int RobotYpixelPos=0;
 
 	if(robCol==0){
-		RobotXpixelPos=screenWidth/18;
+		RobotXpixelPos=screenWidth/20;
 	}
 	else{
-		RobotXpixelPos=(2*robCol+1)*screenWidth/18;
+		RobotXpixelPos=(2*robCol+1)*screenWidth/20;
 	}
 
 	if(robRow==0){
-		RobotYpixelPos=screenHeight/14;
+		RobotYpixelPos=screenHeight/16;
 	}
 	else{
-		RobotYpixelPos=(2*robRow+1)*screenHeight/14;
+		RobotYpixelPos=(2*robRow+1)*screenHeight/16;
 	}
 
 	switch(robHeading){
