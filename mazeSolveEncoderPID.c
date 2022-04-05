@@ -6,19 +6,19 @@ const int screenWidth  = 177;
 const int numOfRows = 8;
 const int numOfCols = 10;
 
-int startRow = 3;
-int startCol = 1;
-int targetRow = 0;
-int targetCol =9;
+int startRow = 7;
+int startCol = 0;
+int targetRow = 4;
+int targetCol = 7;
 int robHeading = 0; // 0=North, 1=East, 2=South, 3=West
 int robRow = startRow;
 int robCol = startCol;
-int gridLength =	654; //328;
+int gridLength =	652; //328;
 int turnTarget = 58;//150;	//found through experimentation rather than calulcation
 float motorSpeed = 25;
 int turnSpeed = 5;
 const int arrayLength = 100;
-int targetColor = 15; //set based on starting point (black or yellow) 21 yellow or 15 black
+int targetColor = 28; //set based on starting point (black or yellow) 30 yellow or 28 black
 int color;
 int alignmentVal = 1;
 bool calcStatus = false;
@@ -137,12 +137,12 @@ task main(){
 	//folow lines from path Taken
 	while(robRow != targetRow || robCol != targetCol){
 
-		if (robCol == 4 && pathTaken[pathIndex] != 3){
-			targetColor = 21; //yellow value
+		if (robCol == 4 && pathTaken[pathIndex] == 1){
+			targetColor = 30; //yellow value
 			alignmentVal = -1;
 		}
-		else if (robCol == 4 && pathTaken[pathIndex] == 3) {
-			targetColor = 15; //black value
+		else if (robCol == 4 && pathTaken[pathIndex] != 1) {
+			targetColor = 28; //black value
 			alignmentVal = 1;
 		}
 
@@ -203,7 +203,7 @@ task main(){
 
 /*----Motion Functions----*/
 void goFwdIRL(){
-	float pConst = 0.75;
+	float pConst = 0.5;//.75
 	float iConst = 0;
 	float dConst = 0;
 	float Error = 0;
@@ -313,19 +313,12 @@ void turnRightIRL(){
 }
 
 void turnLeftIRL(){
-	/*
-	One issue with left turns is that it can under turn causing it to miss algin with the next straight part.
-	one way around this is to left turn in two steps
-	1. turn way past the line as you know a rough estimate as to where the line should be
-	2. turn right until you find the line again
-	one issue i have with this is the edge case of over turning not actually aligning
-	you on the side of the line you expect to be aligned on. Thus i didnt do that and just have it hope for the best
-	*/
+
 
 	resetMotorEncoder(leftMotor);
 	resetMotorEncoder(rightMotor);
 
-	while((abs(getMotorEncoder(leftMotor))<3*turnTarget&&abs(getMotorEncoder(leftMotor))<3*turnTarget)){
+	while((abs(getMotorEncoder(leftMotor))<4*turnTarget-10&&abs(getMotorEncoder(leftMotor))<4*turnTarget-10)){
 		setMotorSpeed(leftMotor,-turnSpeed);
 		setMotorSpeed(rightMotor,turnSpeed);
 	}
