@@ -20,6 +20,8 @@ vMax3 = max(abs(data.speed3));
 vMax4 = max(abs(data.speed4));
 vMax5 = max(abs(data.speed5));
 
+L = 0.3365;
+
 vMax = [vMax1*L, vMax2*L, vMax3*L, vMax4*L, vMax5*L];
 
 p1 = polyfit(thetaMax(1:4), vMax(1:4), 1);
