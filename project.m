@@ -128,10 +128,9 @@ for i = 1:1:3
 end
 
 %% random plot fun stuff
-plot( t, v_rk(:,1)', 'g', t, v_rk(:,2)', 'b', t, v_rk(:,3)', 'm')
-legend('\theta_0 = 5º', '\theta_0 = 10º', '\theta_0 = 15º');
-title('Numerical Solution of Pendulum Velocity'); subtitle('\lambda = 0.03');
-xlabel('time, t (s)'); ylabel('angular velocity, \omega (\circ/s)');
-
-
-
+plot(t, (abs(((x4_rk(:,1)-x6_rk(:,1))./(x4_rk(:,1)))).*100)')
+title('Error with using Small Angle approximation');
+hold on
+plot(t, (abs(((v4_rk(:,1)-v6_rk(:,1))./(v4_rk(:,1)))).*100)')
+legend('Error in Displacement','Error in Velocity');
+xlabel('time, t(s)');ylabel('error, %');
