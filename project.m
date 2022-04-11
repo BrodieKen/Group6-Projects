@@ -58,7 +58,7 @@ t = t0:h:tf;
 %% Angles for lambda = 0.03
 for i = 1:1:3
     figure();
-    plot(t, x_m(:,i)', 'black', t, x4_rk(:,i)', '--r', t, x6_rk(:,i)', '--b')
+    plot(t, x_m(:,i)', 'black', t, x4_rk(:,i)', '--r', t, x6_rk(:,i)', '.b')
     legend('Mathematical Model','Numerical Solution','Numerical Solution with Small Angle Approx.');
     title('Simulated Pendulum Angle'); subtitle(sprintf('θ = %dº, λ= 0.03', 5*i));
     xlabel('time, t (s)'); ylabel('angle, \theta (\circ)');
@@ -67,7 +67,7 @@ end
 %% Angles for lambda = 0.05
 for i = 1:1:3
     figure();
-plot(t, x_m(:,i+3)', 'black', t, x4_rk(:,i+3)', '--r', t, x6_rk(:,i+3)', '--b')
+plot(t, x_m(:,i+3)', 'black', t, x4_rk(:,i+3)', '--r', t, x6_rk(:,i+3)', '.b')
     legend('Mathematical Model','Numerical Solution','Numerical Solution with Small Angle Approx.');
     title('Simulated Pendulum Angle'); subtitle(sprintf('θ = %dº, λ= 0.05', 5*i));
     xlabel('time, t (s)'); ylabel('angle, \theta (\circ)');
@@ -76,7 +76,7 @@ end
 %% Angles for lambda = 0.07
 for i = 1:1:3
     figure();
-plot(t, x_m(:,i+6)', 'black', t, x4_rk(:,i+6)', '--r', t, x6_rk(:,i+6)', '--b')
+plot(t, x_m(:,i+6)', 'black', t, x4_rk(:,i+6)', '--r', t, x6_rk(:,i+6)', '.b')
     legend('Mathematical Model','Numerical Solution','Numerical Solution with Small Angle Approx.');
     title('Simulated Pendulum Angle'); subtitle(sprintf('θ = %dº, λ= 0.07', 5*i));
     xlabel('time, t (s)'); ylabel('angle, \theta (\circ)');
@@ -85,7 +85,7 @@ end
 %% Angles for lambda = 0.09
 for i = 1:1:3
     figure();
-plot(t, x_m(:,i+9)', 'black', t, x4_rk(:,i+9)', '--r', t, x6_rk(:,i+9)', '--b')
+plot(t, x_m(:,i+9)', 'black', t, x4_rk(:,i+9)', '--r', t, x6_rk(:,i+9)', '.b')
     legend('Mathematical Model','Numerical Solution','Numerical Solution with Small Angle Approx.');
     title('Simulated Pendulum Angle'); subtitle(sprintf('θ = %dº, λ= 0.09', 5*i));
     xlabel('time, t (s)'); ylabel('angle, \theta (\circ)');
@@ -94,7 +94,7 @@ end
 %% Velocity for lambda = 0.03
 for i = 1:1:3
     figure();
-    plot(t, v_m(:,i)', 'b', t, v4_rk(:,i)', '--r', t, v6_rk(:,i)', '--m')
+    plot(t, v_m(:,i)', 'b', t, v4_rk(:,i)', '--r', t, v6_rk(:,i)', '.k')
     legend('Mathematical Model','Numerical Solution','Numerical Solution with Small Angle Approx.');
     title('Simulated Pendulum Speed'); subtitle(sprintf('θ = %dº, λ= 0.03', 5*i));
     xlabel('time, t (s)'); ylabel('velocity, V (m/s)');
@@ -103,7 +103,7 @@ end
 %% Velocity for lambda = 0.05
 for i = 1:1:3
     figure();
-    plot(t, v_m(:,i+3)', 'b', t, v4_rk(:,i+3)', '--r', t, v6_rk(:,i+3)', '--m')
+    plot(t, v_m(:,i+3)', 'b', t, v4_rk(:,i+3)', '--r', t, v6_rk(:,i+3)', '.k')
     legend('Mathematical Model','Numerical Solution','Numerical Solution with Small Angle Approx.');
     title('Simulated Pendulum Speed'); subtitle(sprintf('θ = %dº, λ= 0.05', 5*i));
     xlabel('time, t (s)'); ylabel('velocity, V (m/s)');
@@ -112,7 +112,7 @@ end
 %% Velocity for lambda = 0.07
 for i = 1:1:3
     figure();
-    plot(t, v_m(:,i+6)', 'b', t, v4_rk(:,i+6)', '--r', t, v6_rk(:,i+6)', '--m')
+    plot(t, v_m(:,i+6)', 'b', t, v4_rk(:,i+6)', '--r', t, v6_rk(:,i+6)', '.k')
     legend('Mathematical Model','Numerical Solution','Numerical Solution with Small Angle Approx.');
     title('Simulated Pendulum Speed'); subtitle(sprintf('θ = %dº, λ= 0.07', 5*i));
     xlabel('time, t (s)'); ylabel('velocity, V (m/s)');
@@ -121,7 +121,7 @@ end
 %% Velocity for lambda = 0.09
 for i = 1:1:3
     figure();
-    plot(t, v_m(:,i+9)', 'b', t, v4_rk(:,i+9)', '--r', t, v6_rk(:,i+9)', '--m')
+    plot(t, v_m(:,i+9)', 'b', t, v4_rk(:,i+9)', '--r', t, v6_rk(:,i+9)', '.k')
     legend('Mathematical Model','Numerical Solution','Numerical Solution with Small Angle Approx.');
     title('Simulated Pendulum Speed'); subtitle(sprintf('θ = %dº, λ= 0.09', 5*i));
     xlabel('time, t (s)'); ylabel('velocity, V (m/s)');
