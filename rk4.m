@@ -1,5 +1,5 @@
 %Inputs: Initial Time (s), Initial Angle (deg),
-%Initial Velcotiy (deg/s), Final Time (s), Step Size (s), Function
+%Initial Velocity (deg/s), Final Time (s), Step Size (s), Function
 function [xvals,vvals] = rk4(t0, x0, v0, tf, h, f)
 
 %Set initial values
